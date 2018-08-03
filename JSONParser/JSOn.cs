@@ -13,7 +13,7 @@ namespace JSONParser
         private int LastCharIndex;
         private IEnumerator<bool> Enumerator;
         public string Serialized { get; private set; }
-        public Dictionary<string, JsonObject> Result { get; private set; }
+        public JsonObject Result { get; private set; }
 
         public int Progress
         {
@@ -119,7 +119,7 @@ namespace JSONParser
                 }
             }
 
-            Result = CurrentJsonObject.GetValue();
+            Result = CurrentJsonObject;
             yield return true;
         }
 

@@ -19,7 +19,7 @@ namespace JSONParserTests
             {
                 Console.WriteLine("Parsing (" + json.Progress + "%)...");
             }
-            var result = json.Result;
+            var result = json.Result.GetValue();
 
             Assert.IsTrue(result.ContainsKey("key1"));
             Assert.IsTrue(result.ContainsKey("key2"));
@@ -57,7 +57,7 @@ namespace JSONParserTests
                 Console.WriteLine("Parsing (" + json.Progress + "%)...");
             }
 
-            var result = json.Result;
+            var result = json.Result.GetValue();
 
             Assert.IsTrue(result.ContainsKey("jsonObject1"));
             Assert.IsTrue(result.ContainsKey("flatKey1"));
@@ -80,6 +80,60 @@ namespace JSONParserTests
             Assert.IsTrue(nestedObject.ContainsKey("deeplynestedkey1"));
             Assert.AreEqual("deeplynestedvalue1", nestedObject["deeplynestedkey1"].GetString());
 
+
+        }
+
+
+
+        [TestMethod]
+        public void TestJsonObjectToString()
+        {
+            var json = new JSON(
+@"{
+    jsonObject1: {
+        nestedKey1: nestedValue1,
+        nestedKey2: nestedValue2
+    },
+    flatKey1: flatValue1,
+    jsonObject2: {
+        nestedkey1: {
+            deeplynestedkey1: deeplynestedvalue1,
+        },
+        nestedkey2: nestedvalue2
+    }
+}");
+
+            while (!json.ParsingComplete())
+            {
+                Console.WriteLine("Parsing (" + json.Progress + "%)...");
+            }
+
+            var result = json.Result;
+
+            var serialized = result.ToString(true);
+            Console.WriteLine(serialized);
+            var expected = @"{
+  jsonObject1: {
+    nestedKey1: nestedValue1,
+    nestedKey2: nestedValue2
+  },
+  flatKey1: flatValue1,
+  jsonObject2: {
+    nestedkey1: {
+      deeplynestedkey1: deeplynestedvalue1
+    },
+    nestedkey2: nestedvalue2
+  }
+}".Replace("\r\n", "\n");
+            
+            Assert.IsTrue(expected.Equals(serialized));
+
+
+            serialized = result.ToString(false);
+            Console.WriteLine(serialized);
+            expected = "{jsonObject1:{nestedKey1:nestedValue1,nestedKey2:nestedValue2},flatKey1:flatValue1,jsonObject2:{nestedkey1:{deeplynestedkey1:deeplynestedvalue1},nestedkey2:nestedvalue2}}";
+            
+            Assert.AreEqual(expected, serialized);
 
         }
     }

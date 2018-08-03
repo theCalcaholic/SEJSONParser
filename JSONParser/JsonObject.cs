@@ -77,5 +77,38 @@ namespace JSONParser
             return NestedValue;
         }
 
+        override
+        public string ToString()
+        {
+            return ToString(true);
+
+        }
+
+        public string ToString(bool pretty = true)
+        {
+            var result = "";
+            if(Key != "" || StringValue != null)
+                result = Key + (pretty ? ": " : ":");
+            if (StringValue != null)
+            {
+                result += GetString();
+            }
+            else
+            {
+                result += "{";
+                foreach(var kvp in GetValue())
+                {
+                    var childResult = kvp.Value.ToString(pretty);
+                    if (pretty)
+                        childResult = childResult.Replace("\n", "\n  ");
+                    result += (pretty ? "\n  " : "") + childResult + ",";
+                }
+                result = result.Substring(0, result.Length - 1);
+                result += (pretty ? "\n}" : "}");
+            }
+
+            return result;
+        }
+
     }
 }
