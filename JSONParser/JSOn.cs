@@ -56,8 +56,8 @@ namespace JSONParser
                         charIndex = Serialized.IndexOfAny(new char[] { '{', '}', ',' }, LastCharIndex + 1);
                         if (charIndex == -1)
                             throw new UnexpectedCharacterException(new char[] { '{', '}', ',' }, "EOF", LastCharIndex);
-                        Console.WriteLine("Expecting Value...");
-                        Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
+                        //Console.WriteLine("Expecting Value...");
+                        //Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
                         switch (Serialized[charIndex])
                         {
                             case '{':
@@ -69,7 +69,7 @@ namespace JSONParser
                             case '}':
                             case ',':
                                 var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim();
-                                Console.WriteLine("value is: '" + value + "'");
+                                //Console.WriteLine("value is: '" + value + "'");
                                 CurrentJsonObject.SetValue(value);
 
                                 if (Serialized[charIndex] == '}')
@@ -86,8 +86,8 @@ namespace JSONParser
                         break;
                     case JSONPart.KEY:
                         charIndex = Serialized.IndexOfAny(new char[] { '}', ':' }, LastCharIndex + 1);
-                        Console.WriteLine("Expecting Key...");
-                        Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
+                        //Console.WriteLine("Expecting Key...");
+                        //Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
                         if (charIndex == -1)
                             throw new UnexpectedCharacterException(new char[] { '}', ':' }, "EOF", LastCharIndex);
 
@@ -101,7 +101,7 @@ namespace JSONParser
                                 break;
                             case ':':
                                 var key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim();
-                                Console.WriteLine("key is: '" + key + "'");
+                                //Console.WriteLine("key is: '" + key + "'");
                                 CurrentJsonObject = new JsonObject(key);
                                 JsonStack.Peek().GetValue()
                                     .Add(CurrentJsonObject.Key, CurrentJsonObject);
@@ -111,7 +111,7 @@ namespace JSONParser
                         LastCharIndex = charIndex;
                         break;
                 }
-                Console.WriteLine("Iteration done, CurrentJsonObject is: '" + CurrentJsonObject.Key + "'");
+                //Console.WriteLine("Iteration done, CurrentJsonObject is: '" + CurrentJsonObject.Key + "'");
                 if( DateTime.Now - startTime > TimeSpan.FromMilliseconds(30) )
                 {
                     yield return false;
