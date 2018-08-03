@@ -28,6 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -55,9 +56,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JSONParser\JSONParser.csproj">
-      <Project>{f9dd44a8-6da4-4aae-9c00-440180be9505}</Project>
-      <Name>JSONParser</Name>
+    <ProjectReference Include="..\JSONParser Template\JSONParser Template.csproj">
+      <Project>{9aad815e-9727-4765-96cf-134bd712146e}</Project>
+      <Name>JSONParser Template</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

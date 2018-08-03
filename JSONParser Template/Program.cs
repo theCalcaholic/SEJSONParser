@@ -14,7 +14,6 @@ using VRage.Game.ModAPI.Ingame.Utilities;
 using VRage.Game.ObjectBuilders.Definitions;
 using VRage.Game;
 using VRageMath;
-using JSONParser;
 
 namespace IngameScript
 {

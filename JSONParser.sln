@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONParser Template", "ProgramTemplate\JSONParser Template.csproj", "{9AAD815E-9727-4765-96CF-134BD712146E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONParser Template", "JSONParser Template\JSONParser Template.csproj", "{9AAD815E-9727-4765-96CF-134BD712146E}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
