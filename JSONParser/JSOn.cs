@@ -44,7 +44,7 @@ namespace JSONParser
             Stack<Dictionary<string, JsonObject>> ListStack = new Stack<Dictionary<string, JsonObject>>();
             Stack<JsonObject> JsonStack = new Stack<JsonObject>();
             JsonObject CurrentJsonObject = new JsonObject("");
-            var trimChars = new char[] { ' ', '\n', '\r', '\t' };
+            var trimChars = new char[] { '"', '\'', ' ', '\n', '\r', '\t' };
             var startTime = DateTime.Now;
 
             while (LastCharIndex < Serialized.Length - 1)
@@ -68,7 +68,7 @@ namespace JSONParser
                                 break;
                             case '}':
                             case ',':
-                                var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim();
+                                var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
                                 //Console.WriteLine("value is: '" + value + "'");
                                 CurrentJsonObject.SetValue(value);
 
@@ -100,7 +100,7 @@ namespace JSONParser
                                 Expected = JSONPart.KEY;
                                 break;
                             case ':':
-                                var key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim();
+                                var key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
                                 //Console.WriteLine("key is: '" + key + "'");
                                 CurrentJsonObject = new JsonObject(key);
                                 JsonStack.Peek().GetValue()

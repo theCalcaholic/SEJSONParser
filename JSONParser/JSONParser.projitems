@@ -9,5 +9,7 @@
     <Import_RootNamespace>JSONParser</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)JSON.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JsonObject.cs" />
   </ItemGroup>
 </Project>
