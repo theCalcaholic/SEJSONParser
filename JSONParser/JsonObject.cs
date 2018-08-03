@@ -12,30 +12,40 @@ namespace IngameScript
         private string StringValue;
         private Dictionary<string, JsonObject> NestedValue;
         public bool IsFinal { get; private set; }
+        private bool ReadOnly = true;
+        public bool IsPrimitive {
+            get {
+                return StringValue != null;
+            }
+        }
 
-        public JsonObject(string key, string value)
+        public JsonObject(string key, string value, bool readOnly = true)
         {
             Key = key;
             StringValue = value;
             IsFinal = true;
+            ReadOnly = readOnly;
         }
 
-        public JsonObject(string key, Dictionary<string, JsonObject> value)
+        public JsonObject(string key, Dictionary<string, JsonObject> value, bool readOnly = true)
         {
             Key = key;
             NestedValue = value;
             IsFinal = true;
+            ReadOnly = readOnly;
         }
 
-        public JsonObject(string key)
+        public JsonObject(string key, bool readOnly = true)
         {
             Key = key;
             IsFinal = false;
+            ReadOnly = readOnly;
         }
 
-        public JsonObject()
+        public JsonObject(bool readOnly = true)
         {
             IsFinal = false;
+            ReadOnly = readOnly;
         }
 
         public void SetKey(string key)
@@ -67,15 +77,99 @@ namespace IngameScript
             IsFinal = (Key != null);
         }
 
-        public string GetString()
+        public T GetValue<T>()
         {
-            return StringValue;
+            object value = null;
+            if( typeof(T) == typeof(string) )
+            {
+                value = StringValue;
+            }
+            else if( typeof(T) == typeof(int) )
+            {
+                value = Int32.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(float) )
+            {
+                value = Single.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(double) )
+            {
+                value = Double.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(char) )
+            {
+                value = Char.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(DateTime) )
+            {
+                value = DateTime.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(decimal) )
+            {
+                value = Decimal.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(bool) )
+            {
+                value = Boolean.Parse(StringValue);
+            }
+            else if (typeof(T) == typeof(byte) )
+            {
+                value = Byte.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(uint) )
+            {
+                value = UInt32.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(short) )
+            {
+                value = short.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(long) )
+            {
+                value = long.Parse(StringValue);
+            }
+            else if( typeof(T) == typeof(List<JsonObject>) )
+            {
+                var values = GetBody()?.Values;
+                if (values == null)
+                    value = new List<JsonObject>();
+                else
+                    value = new List<JsonObject>(values);
+            }
+            else if( typeof(T) == typeof(Dictionary<string, JsonObject>))
+            {
+                value =  GetBody();
+            }
+            else
+            {
+                throw new ArgumentException("Invalid type '" + typeof(T).ToString() + "' requested!");
+            }
+
+            return (T) value;
         }
 
-        public Dictionary<string, JsonObject> GetValue()
+        public bool TryGetValue<T>(out T result)
+        {
+            try
+            {
+                result = GetValue<T>();
+                return true;
+            }
+            catch( Exception )
+            {
+                result = default(T);
+                return false;
+            }
+        }
+
+
+
+        public Dictionary<string, JsonObject> GetBody()
         {
             return NestedValue;
         }
+
+
 
         override
         public string ToString()
@@ -91,12 +185,12 @@ namespace IngameScript
                 result = Key + (pretty ? ": " : ":");
             if (StringValue != null)
             {
-                result += GetString();
+                result += StringValue;
             }
             else
             {
                 result += "{";
-                foreach(var kvp in GetValue())
+                foreach(var kvp in GetBody())
                 {
                     var childResult = kvp.Value.ToString(pretty);
                     if (pretty)

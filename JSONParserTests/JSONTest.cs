@@ -19,12 +19,12 @@ namespace JSONParserTests
             {
                 Console.WriteLine("Parsing (" + json.Progress + "%)...");
             }
-            var result = json.Result.GetValue();
+            var result = json.Result.GetBody();
 
             Assert.IsTrue(result.ContainsKey("key1"));
             Assert.IsTrue(result.ContainsKey("key2"));
-            Assert.AreEqual("value1", result["key1"].GetString());
-            Assert.AreEqual("value2", result["key2"].GetString());
+            Assert.AreEqual("value1", result["key1"].GetValue<string>());
+            Assert.AreEqual("value2", result["key2"].GetValue<string>());
 
             /*Console.WriteLine("{");
             foreach(var kvp in json)
@@ -57,28 +57,28 @@ namespace JSONParserTests
                 Console.WriteLine("Parsing (" + json.Progress + "%)...");
             }
 
-            var result = json.Result.GetValue();
+            var result = json.Result.GetBody();
 
             Assert.IsTrue(result.ContainsKey("jsonObject1"));
             Assert.IsTrue(result.ContainsKey("flatKey1"));
             Assert.IsTrue(result.ContainsKey("jsonObject2"));
 
-            var jsonObject1 = result["jsonObject1"].GetValue();
+            var jsonObject1 = result["jsonObject1"].GetBody();
             Assert.IsTrue(jsonObject1.ContainsKey("nestedKey1"));
             Assert.IsTrue(jsonObject1.ContainsKey("nestedKey2"));
-            Assert.AreEqual("nestedValue1", jsonObject1["nestedKey1"].GetString());
-            Assert.AreEqual("nestedValue2", jsonObject1["nestedKey2"].GetString());
+            Assert.AreEqual("nestedValue1", jsonObject1["nestedKey1"].GetValue<string>());
+            Assert.AreEqual("nestedValue2", jsonObject1["nestedKey2"].GetValue<string>());
 
-            Assert.AreEqual("flatValue1", result["flatKey1"].GetString());
+            Assert.AreEqual("flatValue1", result["flatKey1"].GetValue<string>());
 
-            var jsonObject2 = result["jsonObject2"].GetValue();
+            var jsonObject2 = result["jsonObject2"].GetBody();
             Assert.IsTrue(jsonObject2.ContainsKey("nestedkey1"));
             Assert.IsTrue(jsonObject2.ContainsKey("nestedkey2"));
-            Assert.AreEqual("nestedvalue2", jsonObject2["nestedkey2"].GetString());
+            Assert.AreEqual("nestedvalue2", jsonObject2["nestedkey2"].GetValue<string>());
 
-            var nestedObject = jsonObject2["nestedkey1"].GetValue();
+            var nestedObject = jsonObject2["nestedkey1"].GetBody();
             Assert.IsTrue(nestedObject.ContainsKey("deeplynestedkey1"));
-            Assert.AreEqual("deeplynestedvalue1", nestedObject["deeplynestedkey1"].GetString());
+            Assert.AreEqual("deeplynestedvalue1", nestedObject["deeplynestedkey1"].GetValue<string>());
 
 
         }

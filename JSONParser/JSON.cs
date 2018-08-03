@@ -14,6 +14,7 @@ namespace IngameScript
         private IEnumerator<bool> Enumerator;
         public string Serialized { get; private set; }
         public JsonObject Result { get; private set; }
+        private bool ReadOnly = true;
 
         public int Progress
         {
@@ -24,10 +25,11 @@ namespace IngameScript
         }
 
 
-        public JSON(string serialized)
+        public JSON(string serialized, bool readOnly = true)
         {
             Serialized = serialized;
             Enumerator = Parse().GetEnumerator();
+            ReadOnly = readOnly;
         }
 
 
@@ -103,7 +105,7 @@ namespace IngameScript
                                 var key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
                                 //Console.WriteLine("key is: '" + key + "'");
                                 CurrentJsonObject = new JsonObject(key);
-                                JsonStack.Peek().GetValue()
+                                JsonStack.Peek().GetBody()
                                     .Add(CurrentJsonObject.Key, CurrentJsonObject);
                                 Expected = JSONPart.VALUE;
                                 break;
