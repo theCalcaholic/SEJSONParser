@@ -36,15 +36,15 @@ namespace IngameScript
 
             if (argument != "")
                 Parser = new JSON(argument);
-            if( Parser.ParsingComplete() ) // will return if parsing is complete, otherwise false
+            if( Parser.ParsingComplete() ) // if parsing is complete...
             {
                 Echo("argument has been parsed!");
-                Echo(Parser.Result.ToString(true));  // This outputs the prettified json
+                Echo(Parser.Result.ToString(true));  // ... output the prettified json
             }
-            else  // if the parsing process isn't complete, we'll continue on the next tick.
+            else  // else...
             {
-                Echo("Parsing (" + Parser.Progress + "%)...");
-                Runtime.UpdateFrequency = UpdateFrequency.Once;
+                Runtime.UpdateFrequency = UpdateFrequency.Once; // ... we'll continue on the next tick
+                Echo("Parsing (" + Parser.Progress + "%)..."); // ... and output the parsing progress
             }
         }
     }
