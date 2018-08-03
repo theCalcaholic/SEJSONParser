@@ -10,27 +10,55 @@ namespace JSONParser
     {
         enum JSONPart { KEY, KEYEND, VALUE, VALUEEND }
 
-        public static Dictionary<string, JsonObject> Parse(string serialized)
+        private int LastCharIndex;
+        private IEnumerator<bool> Enumerator;
+        public string Serialized { get; private set; }
+        public Dictionary<string, JsonObject> Result { get; private set; }
+
+        public int Progress
         {
-            int lastCharIndex = -1;
+            get
+            {
+                return 100 * Math.Max(0, LastCharIndex) / Serialized.Length;
+            }
+        }
+
+
+        public JSON(string serialized)
+        {
+            Serialized = serialized;
+            Enumerator = Parse().GetEnumerator();
+        }
+
+
+        public bool ParsingComplete()
+        {
+            return Enumerator.MoveNext();
+        }
+
+        public IEnumerable<bool> Parse()
+        {
+
+            LastCharIndex = -1;
             JSONPart Expected = JSONPart.VALUE;
             Stack<Dictionary<string, JsonObject>> ListStack = new Stack<Dictionary<string, JsonObject>>();
             Stack<JsonObject> JsonStack = new Stack<JsonObject>();
             JsonObject CurrentJsonObject = new JsonObject("");
             var trimChars = new char[] { ' ', '\n', '\r', '\t' };
+            var startTime = DateTime.Now;
 
-            while (lastCharIndex < serialized.Length - 1)
+            while (LastCharIndex < Serialized.Length - 1)
             {
                 var charIndex = -1;
                 switch (Expected)
                 {
                     case JSONPart.VALUE:
-                        charIndex = serialized.IndexOfAny(new char[] { '{', '}', ',' }, lastCharIndex + 1);
+                        charIndex = Serialized.IndexOfAny(new char[] { '{', '}', ',' }, LastCharIndex + 1);
                         if (charIndex == -1)
-                            throw new UnexpectedCharacterException(new char[] { '{', '}', ',' }, "EOF", lastCharIndex);
+                            throw new UnexpectedCharacterException(new char[] { '{', '}', ',' }, "EOF", LastCharIndex);
                         Console.WriteLine("Expecting Value...");
-                        Console.WriteLine("Found " + serialized[charIndex] + " (" + charIndex + ")");
-                        switch (serialized[charIndex])
+                        Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
+                        switch (Serialized[charIndex])
                         {
                             case '{':
                                 CurrentJsonObject.SetValue(new Dictionary<string, JsonObject>());
@@ -40,13 +68,13 @@ namespace JSONParser
                                 break;
                             case '}':
                             case ',':
-                                var value = serialized.Substring(lastCharIndex + 1, charIndex - lastCharIndex - 1).Trim();
+                                var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim();
                                 Console.WriteLine("value is: '" + value + "'");
                                 CurrentJsonObject.SetValue(value);
 
-                                if (serialized[charIndex] == '}')
+                                if (Serialized[charIndex] == '}')
                                 {
-                                    if (charIndex < serialized.Length - 1 && serialized[charIndex + 1] == ',')
+                                    if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
                                         charIndex++;
                                     CurrentJsonObject = JsonStack.Pop();
                                 }
@@ -54,25 +82,25 @@ namespace JSONParser
                                 Expected = JSONPart.KEY;
                                 break;
                         }
-                        lastCharIndex = charIndex;
+                        LastCharIndex = charIndex;
                         break;
                     case JSONPart.KEY:
-                        charIndex = serialized.IndexOfAny(new char[] { '}', ':' }, lastCharIndex + 1);
+                        charIndex = Serialized.IndexOfAny(new char[] { '}', ':' }, LastCharIndex + 1);
                         Console.WriteLine("Expecting Key...");
-                        Console.WriteLine("Found " + serialized[charIndex] + " (" + charIndex + ")");
+                        Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
                         if (charIndex == -1)
-                            throw new UnexpectedCharacterException(new char[] { '}', ':' }, "EOF", lastCharIndex);
+                            throw new UnexpectedCharacterException(new char[] { '}', ':' }, "EOF", LastCharIndex);
 
-                        switch (serialized[charIndex])
+                        switch (Serialized[charIndex])
                         {
                             case '}':
-                                if (charIndex < serialized.Length - 1 && serialized[charIndex + 1] == ',')
+                                if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
                                     charIndex++;
                                 CurrentJsonObject = JsonStack.Pop();
                                 Expected = JSONPart.KEY;
                                 break;
                             case ':':
-                                var key = serialized.Substring(lastCharIndex + 1, charIndex - lastCharIndex - 1).Trim();
+                                var key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim();
                                 Console.WriteLine("key is: '" + key + "'");
                                 CurrentJsonObject = new JsonObject(key);
                                 JsonStack.Peek().GetValue()
@@ -80,13 +108,19 @@ namespace JSONParser
                                 Expected = JSONPart.VALUE;
                                 break;
                         }
-                        lastCharIndex = charIndex;
+                        LastCharIndex = charIndex;
                         break;
                 }
                 Console.WriteLine("Iteration done, CurrentJsonObject is: '" + CurrentJsonObject.Key + "'");
+                if( DateTime.Now - startTime > TimeSpan.FromMilliseconds(30) )
+                {
+                    yield return false;
+                    startTime = DateTime.Now;
+                }
             }
 
-            return CurrentJsonObject.GetValue();
+            Result = CurrentJsonObject.GetValue();
+            yield return true;
         }
 
         private class ParseException : Exception
