@@ -40,8 +40,9 @@ namespace IngameScript
             bool parsingComplete = false;
             try
             {
-                // this parses the string until a certain time limit is reached or it has finished.
-                // This prevents the script from causing lags (we distribute the load evenly over multiple ticks, if necessary
+                // This Method parses the string until a certain time limit is reached or it has finished.
+                // Doing this prevents the script from causing lags (we distribute the load evenly over multiple
+                // ticks, if necessary)
                 parsingComplete = Parser.ParsingComplete();
             }
             catch( Exception e) // in case something went wrong (either your json is wrong or my library has a bug :P)
