@@ -1,7 +1,7 @@
 # Space Engineers JSON Parser
 
 ## Description
-This is just a small JSON library which can be used for de-/serialization in Space Engineers' ingame scripts in a performance friendly way.
+This is a small JSON library which can be used for de-/serialization in Space Engineers' ingame scripts in a performance friendly way.
 
 ## Setup
 If you want to use this in Visual Studio with SE-MDK (Highly Recommended), just add the JSONParser project to your Solution, add a reference to it to your ingame script project, and you're set.
