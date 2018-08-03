@@ -36,9 +36,23 @@ namespace IngameScript
 
             if (argument != "")
                 Parser = new JSON(argument);
-            if( Parser.ParsingComplete() ) // if parsing is complete...
+
+            bool parsingComplete = false;
+            try
             {
-                Echo("argument has been parsed!");
+                // this parses the string until a certain time limit is reached or it has finished.
+                // This prevents the script from causing lags (we distribute the load evenly over multiple ticks, if necessary
+                parsingComplete = Parser.ParsingComplete();
+            }
+            catch( Exception e) // in case something went wrong (either your json is wrong or my library has a bug :P)
+            {
+                Echo("There's somethign wrong with your json: " + e.Message);
+                return;
+            }
+
+            if( parsingComplete ) // if parsing is complete...
+            {
+                Echo("Argument has been parsed!");
                 Echo(Parser.Result.ToString(true));  // ... output the prettified json
             }
             else  // else...
