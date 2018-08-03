@@ -33,7 +33,7 @@ namespace JSONParser
 
         public bool ParsingComplete()
         {
-            return Enumerator.MoveNext();
+            return !Enumerator.MoveNext();
         }
 
         public IEnumerable<bool> Parse()
