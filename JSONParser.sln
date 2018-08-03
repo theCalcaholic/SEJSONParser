@@ -3,29 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONParser", "JSONParser\JSONParser.csproj", "{F9DD44A8-6DA4-4AAE-9C00-440180BE9505}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONParserTests", "UnitTestProject1\JSONParserTests.csproj", "{14078E0E-53AD-40BF-9913-58BDC54BE060}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSONParser", "JSONParser\JSONParser.shproj", "{60B41D4B-F453-4FBC-8132-418E4C92FBF2}"
 EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F9DD44A8-6DA4-4AAE-9C00-440180BE9505}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9DD44A8-6DA4-4AAE-9C00-440180BE9505}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9DD44A8-6DA4-4AAE-9C00-440180BE9505}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9DD44A8-6DA4-4AAE-9C00-440180BE9505}.Release|Any CPU.Build.0 = Release|Any CPU
-		{14078E0E-53AD-40BF-9913-58BDC54BE060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14078E0E-53AD-40BF-9913-58BDC54BE060}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14078E0E-53AD-40BF-9913-58BDC54BE060}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{14078E0E-53AD-40BF-9913-58BDC54BE060}.Release|Any CPU.Build.0 = Release|Any CPU
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		JSONParser\JSONParser.projitems*{60b41d4b-f453-4fbc-8132-418e4c92fbf2}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {23BC61DF-4C01-4527-AAAC-20297AC7E3E5}
+		SolutionGuid = {BF792760-0B81-4A14-B198-0B1C1E5E3534}
 	EndGlobalSection
 EndGlobal
