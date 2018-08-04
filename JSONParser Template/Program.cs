@@ -14,6 +14,7 @@ using VRage.Game.ModAPI.Ingame.Utilities;
 using VRage.Game.ObjectBuilders.Definitions;
 using VRage.Game;
 using VRageMath;
+using JSONParser;
 
 namespace IngameScript
 {
@@ -29,12 +30,21 @@ namespace IngameScript
         {
         }
 
+        public bool shouldPause()
+        {
+            return Runtime.CurrentInstructionCount > 1000;
+        }
+
         public void Main(string argument, UpdateType updateSource)
         {
             // This will deserialize the argument, for demonstration purposes
 
+            
             if (argument != "")
-                Parser = new JSON(argument);
+                // Creates a new instance of the parser. 'argument' is the json string which is
+                // going to be parsed, 'shouldPause' is a function which returns true when the
+                // parsing should be paused (to be continued later)
+                Parser = new JSON(argument, shouldPause);
 
             bool parsingComplete = false;
             try

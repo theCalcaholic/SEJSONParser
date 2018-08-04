@@ -56,9 +56,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JSONParser Template\JSONParser Template.csproj">
-      <Project>{9aad815e-9727-4765-96cf-134bd712146e}</Project>
-      <Name>JSONParser Template</Name>
+    <ProjectReference Include="..\ClassLibrary1\TestWrapper.csproj">
+      <Project>{952b69c9-0894-4c1d-8e6b-eb4c5dd87d4e}</Project>
+      <Name>TestWrapper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

@@ -7,7 +7,11 @@
   </PropertyGroup>
   <PropertyGroup Label="Configuration" />
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)IJsonNonPrimitive.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JSON.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JsonList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JsonObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JsonElement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JsonPrimitive.cs" />
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IngameScript
+namespace JSONParser
 {
     public class JSON
     {
@@ -13,8 +13,9 @@ namespace IngameScript
         private int LastCharIndex;
         private IEnumerator<bool> Enumerator;
         public string Serialized { get; private set; }
-        public JsonObject Result { get; private set; }
-        private bool ReadOnly = true;
+        public JsonElement Result { get; private set; }
+        private bool ReadOnly;
+        private Func<bool> ShouldPause;
 
         public int Progress
         {
@@ -25,11 +26,12 @@ namespace IngameScript
         }
 
 
-        public JSON(string serialized, bool readOnly = true)
+        public JSON(string serialized, Func<bool> shouldPause, bool readOnly = true)
         {
             Serialized = serialized;
             Enumerator = Parse().GetEnumerator();
             ReadOnly = readOnly;
+            ShouldPause = shouldPause;
         }
 
 
@@ -40,88 +42,99 @@ namespace IngameScript
 
         public IEnumerable<bool> Parse()
         {
-
+            var readOnly = false;
             LastCharIndex = -1;
             JSONPart Expected = JSONPart.VALUE;
-            Stack<Dictionary<string, JsonObject>> ListStack = new Stack<Dictionary<string, JsonObject>>();
-            Stack<JsonObject> JsonStack = new Stack<JsonObject>();
-            JsonObject CurrentJsonObject = new JsonObject("");
-            var trimChars = new char[] { '"', '\'', ' ', '\n', '\r', '\t' };
-            var startTime = DateTime.Now;
+            Stack<Dictionary<string, JsonElement>> ListStack = new Stack<Dictionary<string, JsonElement>>();
+            Stack<IJsonNonPrimitive> JsonStack = new Stack<IJsonNonPrimitive>();
+            IJsonNonPrimitive CurrentNestedJsonObject = null;
+            //Func<object, JsonObject> Generator = JsonObject.NewJsonObject("", readOnly);
+            var trimChars = new char[] { '"', '\'', ' ', '\n', '\r', '\t', '\f' };
+            string Key = "";
+            var keyDelims = new char[] { '}', ':' };
+            var valueDelims = new char[] { '{', '}', ',', '[', ']' };
+            var expectedDelims = valueDelims;
+            var charIndex = -1;
+            bool insideList = false;
 
             while (LastCharIndex < Serialized.Length - 1)
             {
-                var charIndex = -1;
-                switch (Expected)
+                charIndex = Serialized.IndexOfAny(expectedDelims, LastCharIndex + 1);
+                if (charIndex == -1)
+                    throw new UnexpectedCharacterException(expectedDelims, "EOF", LastCharIndex);
+
+                if (Expected == JSONPart.VALUE)
                 {
-                    case JSONPart.VALUE:
-                        charIndex = Serialized.IndexOfAny(new char[] { '{', '}', ',' }, LastCharIndex + 1);
-                        if (charIndex == -1)
-                            throw new UnexpectedCharacterException(new char[] { '{', '}', ',' }, "EOF", LastCharIndex);
-                        //Console.WriteLine("Expecting Value...");
-                        //Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
-                        switch (Serialized[charIndex])
-                        {
-                            case '{':
-                                CurrentJsonObject.SetValue(new Dictionary<string, JsonObject>());
-                                JsonStack.Push(CurrentJsonObject);
-                                CurrentJsonObject = new JsonObject();
-                                Expected = JSONPart.KEY;
-                                break;
-                            case '}':
-                            case ',':
-                                var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
-                                //Console.WriteLine("value is: '" + value + "'");
-                                CurrentJsonObject.SetValue(value);
-
-                                if (Serialized[charIndex] == '}')
-                                {
-                                    if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
-                                        charIndex++;
-                                    CurrentJsonObject = JsonStack.Pop();
-                                }
-
-                                Expected = JSONPart.KEY;
-                                break;
-                        }
-                        LastCharIndex = charIndex;
-                        break;
-                    case JSONPart.KEY:
-                        charIndex = Serialized.IndexOfAny(new char[] { '}', ':' }, LastCharIndex + 1);
-                        //Console.WriteLine("Expecting Key...");
-                        //Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
-                        if (charIndex == -1)
-                            throw new UnexpectedCharacterException(new char[] { '}', ':' }, "EOF", LastCharIndex);
-
-                        switch (Serialized[charIndex])
-                        {
-                            case '}':
-                                if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
-                                    charIndex++;
-                                CurrentJsonObject = JsonStack.Pop();
-                                Expected = JSONPart.KEY;
-                                break;
-                            case ':':
-                                var key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
-                                //Console.WriteLine("key is: '" + key + "'");
-                                CurrentJsonObject = new JsonObject(key);
-                                JsonStack.Peek().GetBody()
-                                    .Add(CurrentJsonObject.Key, CurrentJsonObject);
-                                Expected = JSONPart.VALUE;
-                                break;
-                        }
-                        LastCharIndex = charIndex;
-                        break;
+                    Console.WriteLine("Expecting Value...");
+                    Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
+                    switch (Serialized[charIndex])
+                    {
+                        case '[':
+                            CurrentNestedJsonObject = new JsonList(Key, readOnly);
+                            if (JsonStack.Count > 0)
+                                JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
+                            JsonStack.Push(CurrentNestedJsonObject);
+                            insideList = true;
+                            Console.WriteLine("List started");
+                            break;
+                        case '{':
+                            CurrentNestedJsonObject = new JsonObject(Key, readOnly);
+                            if (JsonStack.Count > 0)
+                                JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
+                            JsonStack.Push(CurrentNestedJsonObject);
+                            Expected = JSONPart.KEY;
+                            expectedDelims = keyDelims;
+                            break;
+                        case ',':
+                        case '}':
+                        case ']':
+                            var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
+                            Console.WriteLine("value is: '" + value + "'");
+                            JsonStack.Peek().Add(new JsonPrimitive(Key, value, readOnly));
+                            break;
+                    }
+                    if (insideList && Serialized[charIndex] != ']')
+                    {
+                        Key = null;
+                    }
+                    else
+                    {
+                        insideList = false;
+                        Expected = JSONPart.KEY;
+                        expectedDelims = keyDelims;
+                    }
                 }
-                //Console.WriteLine("Iteration done, CurrentJsonObject is: '" + CurrentJsonObject.Key + "'");
-                if( DateTime.Now - startTime > TimeSpan.FromMilliseconds(30) )
+                else if ( Expected == JSONPart.KEY )
+                {
+                    Console.WriteLine("Expecting Key...");
+                    Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
+
+                    switch ( Serialized[charIndex] )
+                    {
+                        case ':':
+                            Key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
+                            Console.WriteLine("key is: '" + Key + "'");
+                            //Generator = JsonObject.NewJsonObject(Key, readOnly);
+                            Expected = JSONPart.VALUE;
+                            expectedDelims = valueDelims;
+                            break;
+                    }
+                }
+                if ( Serialized[charIndex] == '}' || Serialized[charIndex] == ']' )
+                {
+                    if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
+                        charIndex++;
+                    CurrentNestedJsonObject = JsonStack.Pop();
+                }
+                LastCharIndex = charIndex;
+                //Console.WriteLine("Iteration done, CurrentJsonObject is: '" + CurrentNestedJsonObject.Key + "'");
+                if ( ShouldPause() )
                 {
                     yield return false;
-                    startTime = DateTime.Now;
                 }
             }
 
-            Result = CurrentJsonObject;
+            Result = CurrentNestedJsonObject as JsonElement;
             yield return true;
         }
 
