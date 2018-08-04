@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace JSONParser
+namespace IngameScript
 {
     public class JsonList : JsonElement, IJsonNonPrimitive, ICollection<JsonElement>
     {

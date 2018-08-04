@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JSONParser
+namespace IngameScript
 {
     public class JsonPrimitive : JsonElement
     {
