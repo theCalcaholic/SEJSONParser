@@ -65,8 +65,8 @@ namespace JSONParser
 
                 if (Expected == JSONPart.VALUE)
                 {
-                    Console.WriteLine("Expecting Value...");
-                    Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
+                    //Console.WriteLine("Expecting Value...");
+                    //Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
                     switch (Serialized[charIndex])
                     {
                         case '[':
@@ -75,7 +75,7 @@ namespace JSONParser
                                 JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
                             JsonStack.Push(CurrentNestedJsonObject);
                             insideList = true;
-                            Console.WriteLine("List started");
+                            //Console.WriteLine("List started");
                             break;
                         case '{':
                             CurrentNestedJsonObject = new JsonObject(Key, readOnly);
@@ -89,7 +89,7 @@ namespace JSONParser
                         case '}':
                         case ']':
                             var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
-                            Console.WriteLine("value is: '" + value + "'");
+                            //Console.WriteLine("value is: '" + value + "'");
                             JsonStack.Peek().Add(new JsonPrimitive(Key, value, readOnly));
                             break;
                     }
@@ -106,14 +106,14 @@ namespace JSONParser
                 }
                 else if ( Expected == JSONPart.KEY )
                 {
-                    Console.WriteLine("Expecting Key...");
-                    Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
+                    //Console.WriteLine("Expecting Key...");
+                    //Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
 
                     switch ( Serialized[charIndex] )
                     {
                         case ':':
                             Key = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
-                            Console.WriteLine("key is: '" + Key + "'");
+                            //Console.WriteLine("key is: '" + Key + "'");
                             //Generator = JsonObject.NewJsonObject(Key, readOnly);
                             Expected = JSONPart.VALUE;
                             expectedDelims = valueDelims;
