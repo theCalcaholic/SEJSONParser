@@ -4,7 +4,7 @@ using System.Text;
 
 namespace JSONParser
 {
-    class JsonList : JsonElement, IJsonNonPrimitive
+    public class JsonList : JsonElement, IJsonNonPrimitive
     {
         private List<JsonElement> Values;
 
