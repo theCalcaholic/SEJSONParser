@@ -37,6 +37,12 @@ namespace JSONParser
             return Value.ContainsKey(key);
         }
 
+        public JsonElement GetValueOrDefault(string key)
+        {
+            if (ContainsKey(key))
+                return this[key];
+            return null;
+        }
 
         public JsonObject(string key, bool readOnly = true)
         {
