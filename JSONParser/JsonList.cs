@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
 namespace JSONParser
 {
-    public class JsonList : JsonElement, IJsonNonPrimitive
+    public class JsonList : JsonElement, IJsonNonPrimitive, ICollection<JsonElement>
     {
         private List<JsonElement> Values;
 
@@ -32,7 +33,15 @@ namespace JSONParser
             }
         }
 
-        public JsonList(string key, bool readOnly)
+        public bool IsReadOnly
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public JsonList(string key)
         {
             Key = key;
             Values = new List<JsonElement>();
@@ -61,6 +70,44 @@ namespace JSONParser
             result += (pretty ? "\n]" : "]");
 
             return result;
+        }
+
+        public void Clear()
+        {
+            Values.Clear();
+        }
+
+        public bool Contains(JsonElement item)
+        {
+            return Values.Contains(item);
+        }
+
+        public void CopyTo(JsonElement[] array, int arrayIndex)
+        {
+            Values.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(JsonElement item)
+        {
+            return Values.Remove(item);
+        }
+
+        private IEnumerable<JsonElement> Elements()
+        {
+            foreach(var value in Values)
+            {
+                yield return value;
+            }
+        }
+
+        public IEnumerator<JsonElement> GetEnumerator()
+        {
+            return Elements().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

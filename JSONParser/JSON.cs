@@ -42,7 +42,6 @@ namespace JSONParser
 
         public IEnumerable<bool> Parse()
         {
-            var readOnly = false;
             LastCharIndex = -1;
             JSONPart Expected = JSONPart.VALUE;
             Stack<Dictionary<string, JsonElement>> ListStack = new Stack<Dictionary<string, JsonElement>>();
@@ -70,7 +69,7 @@ namespace JSONParser
                     switch (Serialized[charIndex])
                     {
                         case '[':
-                            CurrentNestedJsonObject = new JsonList(Key, readOnly);
+                            CurrentNestedJsonObject = new JsonList(Key);
                             if (JsonStack.Count > 0)
                                 JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
                             JsonStack.Push(CurrentNestedJsonObject);
@@ -78,7 +77,7 @@ namespace JSONParser
                             //Console.WriteLine("List started");
                             break;
                         case '{':
-                            CurrentNestedJsonObject = new JsonObject(Key, readOnly);
+                            CurrentNestedJsonObject = new JsonObject(Key);
                             if (JsonStack.Count > 0)
                                 JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
                             JsonStack.Push(CurrentNestedJsonObject);
@@ -90,7 +89,7 @@ namespace JSONParser
                         case ']':
                             var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
                             //Console.WriteLine("value is: '" + value + "'");
-                            JsonStack.Peek().Add(new JsonPrimitive(Key, value, readOnly));
+                            JsonStack.Peek().Add(new JsonPrimitive(Key, value));
                             break;
                     }
                     if (insideList && Serialized[charIndex] != ']')

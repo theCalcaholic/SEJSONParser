@@ -44,7 +44,7 @@ namespace JSONParser
             return null;
         }
 
-        public JsonObject(string key, bool readOnly = true)
+        public JsonObject(string key)
         {
             Key = key;
             Value = new Dictionary<string, JsonElement>();

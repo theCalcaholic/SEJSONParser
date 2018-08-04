@@ -16,7 +16,7 @@ namespace JSONParser
             }
         }
 
-        public JsonPrimitive(string key, string value, bool readOnly = true)
+        public JsonPrimitive(string key, string value)
         {
             Key = key;
             Value = value;
