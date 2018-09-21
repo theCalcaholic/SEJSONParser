@@ -94,6 +94,34 @@ namespace JSONParserTests
 
         }
 
+        [TestMethod]
+        public void TestJsonList()
+        {
+            var json = new JSON(
+@"{
+    list1: [
+        { nestedKey1: nestedValue1 },
+        { nestedKey2: nestedValue2 }
+    ],
+    flatKey1: flatValue1,
+    list2: [
+        {
+            nestedkey1: {
+                deeplynestedkey1: deeplynestedvalue1,
+            }
+        },
+        { nestedkey2: nestedvalue2 }
+    ]
+}", shouldPause);
+
+            parsingStarted = DateTime.Now;
+            while (!json.ParsingComplete())
+            {
+                Console.WriteLine("Parsing (" + json.Progress + "%)...");
+            }
+
+
+        }
 
 
         [TestMethod]

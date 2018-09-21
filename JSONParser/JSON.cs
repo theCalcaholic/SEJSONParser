@@ -47,6 +47,7 @@ namespace IngameScript
             Stack<Dictionary<string, JsonElement>> ListStack = new Stack<Dictionary<string, JsonElement>>();
             Stack<IJsonNonPrimitive> JsonStack = new Stack<IJsonNonPrimitive>();
             IJsonNonPrimitive CurrentNestedJsonObject = null;
+            IJsonNonPrimitive LastNestedJsonObject = null;
             //Func<object, JsonObject> Generator = JsonObject.NewJsonObject("", readOnly);
             var trimChars = new char[] { '"', '\'', ' ', '\n', '\r', '\t', '\f' };
             string Key = "";
@@ -54,7 +55,7 @@ namespace IngameScript
             var valueDelims = new char[] { '{', '}', ',', '[', ']' };
             var expectedDelims = valueDelims;
             var charIndex = -1;
-            bool insideList = false;
+            bool isInsideList = false;
 
             while (LastCharIndex < Serialized.Length - 1)
             {
@@ -62,21 +63,21 @@ namespace IngameScript
                 if (charIndex == -1)
                     throw new UnexpectedCharacterException(expectedDelims, "EOF", LastCharIndex);
 
+                char foundChar = Serialized[charIndex];
                 if (Expected == JSONPart.VALUE)
                 {
                     //Console.WriteLine("Expecting Value...");
                     //Console.WriteLine("Found " + Serialized[charIndex] + " (" + charIndex + ")");
-                    switch (Serialized[charIndex])
+                    switch (foundChar)
                     {
                         case '[':
                             CurrentNestedJsonObject = new JsonList(Key);
-                            if (JsonStack.Count > 0)
-                                JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
+                            JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
                             JsonStack.Push(CurrentNestedJsonObject);
-                            insideList = true;
                             //Console.WriteLine("List started");
                             break;
                         case '{':
+                            //Console.WriteLine("Found new JsonObject");
                             CurrentNestedJsonObject = new JsonObject(Key);
                             if (JsonStack.Count > 0)
                                 JsonStack.Peek().Add(CurrentNestedJsonObject as JsonElement);
@@ -90,15 +91,32 @@ namespace IngameScript
                             var value = Serialized.Substring(LastCharIndex + 1, charIndex - LastCharIndex - 1).Trim(trimChars);
                             //Console.WriteLine("value is: '" + value + "'");
                             JsonStack.Peek().Add(new JsonPrimitive(Key, value));
+                            if (foundChar == '}' || foundChar == ']')
+                            {
+                                /*if (foundChar == ']')
+                                {
+                                    Console.WriteLine("Leaving List...");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Leaving JsonObject...");
+                                }*/
+                                if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
+                                    charIndex++;
+                                LastNestedJsonObject = JsonStack.Pop();
+                            }
                             break;
                     }
-                    if (insideList && Serialized[charIndex] != ']')
+
+                    isInsideList = JsonStack.Count == 0 || JsonStack.Peek() is JsonList;
+                    if (isInsideList)
                     {
                         Key = null;
+                        Expected = JSONPart.VALUE;
+                        expectedDelims = valueDelims;
                     }
                     else
                     {
-                        insideList = false;
                         Expected = JSONPart.KEY;
                         expectedDelims = keyDelims;
                     }
@@ -117,14 +135,18 @@ namespace IngameScript
                             Expected = JSONPart.VALUE;
                             expectedDelims = valueDelims;
                             break;
+                        case '}':
+                            //Console.WriteLine("Leaving JsonObject...");
+                            if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
+                                charIndex++;
+                            LastNestedJsonObject = JsonStack.Pop();
+                            break;
+                        default:
+                            //Console.WriteLine($"Invalid character found: '{Serialized[charIndex]}', expected ':'!");
+                            break;
                     }
                 }
-                if ( Serialized[charIndex] == '}' || Serialized[charIndex] == ']' )
-                {
-                    if (charIndex < Serialized.Length - 1 && Serialized[charIndex + 1] == ',')
-                        charIndex++;
-                    CurrentNestedJsonObject = JsonStack.Pop();
-                }
+
                 LastCharIndex = charIndex;
                 //Console.WriteLine("Iteration done, CurrentJsonObject is: '" + CurrentNestedJsonObject.Key + "'");
                 if ( ShouldPause() )
@@ -133,7 +155,7 @@ namespace IngameScript
                 }
             }
 
-            Result = CurrentNestedJsonObject as JsonElement;
+            Result = LastNestedJsonObject as JsonElement;
             yield return true;
         }
 
